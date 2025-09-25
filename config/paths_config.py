@@ -7,7 +7,7 @@ CONFIG_PATH = 'config/config.yaml'
 
 
 ############### DATA PREPROCESSING ##################
-PROCESSED_DIR = 'artifacts/processed'
+PROCESSED_DIR = 'artifacts/processed/'
 ANIMELIST_CSV = 'artifacts/raw/animelist.csv'
 ANIME_CSV = 'artifacts/raw/anime.csv'
 ANIMESYNOPSIS_CSV = 'artifacts/raw/anime_with_synopsis.csv'
@@ -29,7 +29,7 @@ ANIME2ANIME_DECODED = 'artifacts/processed/anime2anime_decoded.pkl'
 
 ######################## MODEL TRAINING ########################
 MODEL_DIR = 'artifacts/model'
-WEIGHTS_DIR = 'artifacts/weights'
+WEIGHTS_DIR = 'artifacts/weights/'
 MODEL_PATH = os.path.join(MODEL_DIR, 'model.h5')
 ANIMES_WEIGHTS_PATH = os.path.join(WEIGHTS_DIR, 'anime_weights.pkl')
 USER_WEIGHTS_PATH = os.path.join(WEIGHTS_DIR, 'user_weights.pkl')

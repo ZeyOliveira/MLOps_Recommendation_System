@@ -1,0 +1,4 @@
+[core]
+    remote = mlopssystemrecomendation
+['remote "mlopssystemrecomendation"']
+    url = gs://my-dvc-bucket157/
