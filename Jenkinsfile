@@ -62,7 +62,7 @@ pipeline{
                     script {
                         echo 'Starting model training and pushing artifacts with DVC to GCS'
                         sh '''
-                        .${VENV_DIR}/bin/activate
+                        . ${VENV_DIR}/bin/activate
 
                         # Garante que o diretório 'artifacts' e 'artifacts/model' existam antes de salvar o modelo
                         mkdir -p artifacts/model
