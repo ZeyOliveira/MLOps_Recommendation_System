@@ -36,13 +36,33 @@ pipeline{
         }
 
 
+        // NOVO ESTÁGIO E POSICIONAMENTO CORRETO: Puxar Dados Brutos (RAW DATA)
+        stage('DVC Pull Raw Data') {
+            steps {
+                withCredentials([file(credentialsId:'gcp-key', variable:'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    script {
+                        echo 'Pulling raw data with DVC from GCS'
+                        // ATENÇÃO: Use """ (aspas duplas triplas) para interpolação de variáveis
+                        sh """
+                        . ${VENV_DIR}/bin/activate
+                        mkdir -p artifacts/raw # Garante que o diretório exista
+                        dvc pull artifacts/raw/animelist.csv # Puxa o arquivo específico
+                        # Ou, se você rastreia todo o diretório 'artifacts/raw', use:
+                        # dvc pull artifacts/raw/
+                        """
+                    }
+                }
+            }
+        }
+
+
         stage('Model Training and DVC Push') {
             steps {
                 withCredentials([file(credentialsId:'gcp-key', variable:'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script {
                         echo 'Starting model training and pushing artifacts with DVC to GCS'
                         sh '''
-                        . ${VENV_DIR}/bin/activate
+                        .${VENV_DIR}/bin/activate
 
                         # Garante que o diretório 'artifacts' e 'artifacts/model' existam antes de salvar o modelo
                         mkdir -p artifacts/model
