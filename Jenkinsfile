@@ -25,11 +25,11 @@ pipeline {
                 script {
                     echo 'Setting up Python virtual environment and installing dependencies on Jenkins agent'
                     sh '''
-                    python3 -m venv ${VENV_DIR}
+                    python -m venv ${VENV_DIR}
                     . ${VENV_DIR}/bin/activate
                     pip install --upgrade pip
                     pip install -e .
-                    pip install dvc google-cloud-storage
+                    pip install dvc
                     '''
                 }
             }
