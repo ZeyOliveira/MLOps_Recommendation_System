@@ -99,4 +99,5 @@ pipeline{
             // Limpa workspace no final
             cleanWs()
         }
+    }
 }
