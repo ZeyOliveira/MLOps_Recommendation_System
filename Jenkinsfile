@@ -1,6 +1,11 @@
 pipeline{
     agent any
 
+    options {
+        // Mantém só 1 build antigo
+        buildDiscarder(logRotator(numToKeepStr: '1'))
+    }
+
     environment{
         VENV_DIR = 'venv'
         GCP_PROJECT = 'groovy-treat-471720-n1'
@@ -14,7 +19,7 @@ pipeline{
             steps{
                 script{
                     echo 'Cloning from Github'
-                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'jenkins-github-token', url: 'https://github.com/ZeyOliveira/MLOps_Recommendation_System.git']])
+                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-key', url: 'https://github.com/ZeyOliveira/MLOps_Recommendation_System.git']])
                 }
             }
         }
@@ -31,51 +36,6 @@ pipeline{
                     pip install -e .
                     pip install dvc
                     '''
-                }
-            }
-        }
-
-
-        // NOVO ESTÁGIO E POSICIONAMENTO CORRETO: Puxar Dados Brutos (RAW DATA)
-        stage('DVC Pull Raw Data') {
-            steps {
-                withCredentials([file(credentialsId:'gcp-key', variable:'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    script {
-                        echo 'Pulling raw data with DVC from GCS'
-                        // ATENÇÃO: Use """ (aspas duplas triplas) para interpolação de variáveis
-                        sh """
-                        . ${VENV_DIR}/bin/activate
-                        mkdir -p artifacts/raw # Garante que o diretório exista
-                        dvc pull artifacts/raw/animelist.csv # Puxa o arquivo específico
-                        # Ou, se você rastreia todo o diretório 'artifacts/raw', use:
-                        # dvc pull artifacts/raw/
-                        """
-                    }
-                }
-            }
-        }
-
-
-        stage('Model Training and DVC Push') {
-            steps {
-                withCredentials([file(credentialsId:'gcp-key', variable:'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    script {
-                        echo 'Starting model training and pushing artifacts with DVC to GCS'
-                        sh '''
-                        . ${VENV_DIR}/bin/activate
-
-                        # Garante que o diretório 'artifacts' e 'artifacts/model' existam antes de salvar o modelo
-                        mkdir -p artifacts/model
-
-                        # Executa o script de treinamento.
-                        # ESTE SCRIPT DEVE SALVAR O MODELO EM 'artifacts/model/'
-                        python pipeline/pipeline_training.py
-
-                        # Adiciona o diretório 'artifacts/model' ao DVC e faz o push
-                        dvc add artifacts/model/ # <-- AJUSTE AQUI
-                        dvc push
-                        '''
-                    }
                 }
             }
         }
@@ -132,9 +92,11 @@ pipeline{
             }
         }
     }
+
+
     post {
         always {
+            // Limpa workspace no final
             cleanWs()
         }
-    }
 }
